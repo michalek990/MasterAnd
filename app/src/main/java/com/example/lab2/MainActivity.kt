@@ -1,6 +1,5 @@
 package com.example.lab2
 
-import GameScreen
 import StartScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -27,9 +26,10 @@ fun AppNavigation() {
         composable("gameScreen/{colorCount}") { backStackEntry ->
             GameScreen(navController, backStackEntry.arguments?.getString("colorCount")?.toInt() ?: 4)
         }
-        composable("resultScreen/{attempts}") { backStackEntry ->
+        composable("resultScreen/{attempts}/{colorCount}") { backStackEntry ->
             val attempts = backStackEntry.arguments?.getString("attempts")?.toInt() ?: 0
-            ResultScreen(attempts, navController)
+            val colorCount = backStackEntry.arguments?.getString("colorCount")?.toInt() ?: 4
+            ResultScreen(attempts, navController, colorCount)
         }
     }
 }
