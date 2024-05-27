@@ -18,25 +18,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-@Composable
-fun AppNavigation() {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "startScreen") {
-        composable("startScreen") { StartScreen(navController) }
-        composable("gameScreen/{colorCount}?userEmail={userEmail}") { backStackEntry ->
-            val colorCount = backStackEntry.arguments?.getString("colorCount")?.toInt() ?: 4
-            val userEmail = backStackEntry.arguments?.getString("userEmail") ?: "user@example.com"
-            GameScreen(navController, colorCount, userEmail)
-        }
-        composable("resultScreen/{attempts}/{colorCount}?userEmail={userEmail}") { backStackEntry ->
-            val attempts = backStackEntry.arguments?.getString("attempts")?.toInt() ?: 0
-            val colorCount = backStackEntry.arguments?.getString("colorCount")?.toInt() ?: 4
-            val userEmail = backStackEntry.arguments?.getString("userEmail") ?: "user@example.com"
-            ResultScreen(attempts, navController, colorCount, userEmail)
-        }
-        composable("resultsScreen") {
-            ScoresScreen(navController)
-        }
-    }
-}
-
