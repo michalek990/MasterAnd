@@ -26,67 +26,87 @@ fun GameScreen(navController: NavController, colorCount: Int) {
     val gameWon = remember { mutableStateOf(false) }
     val selectedColor = remember { mutableStateOf<Color?>(null) }
 
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        GameRow(
-            attemptColors = currentAttempt.value,
-            isClickable = !gameWon.value,
-            onSelectColor = { colorIndex ->
-                selectedColor.value?.let { color ->
-                    currentAttempt.value = currentAttempt.value.toMutableList().apply {
-                        set(colorIndex, color)
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                GameRow(
+                    attemptColors = currentAttempt.value,
+                    isClickable = !gameWon.value,
+                    onSelectColor = { colorIndex ->
+                        selectedColor.value?.let { color ->
+                            currentAttempt.value = currentAttempt.value.toMutableList().apply {
+                                set(colorIndex, color)
+                            }
+                        }
+                    },
+                ) {
+                    attempts.add(currentAttempt.value.toList())
+                    currentAttempt.value = List(colorCount) { Color.Gray }
+                    if (checkWinCondition(attempts.last(), secretCombo.value)) {
+                        gameWon.value = true
                     }
                 }
-            },
-        ) {
-            attempts.add(currentAttempt.value.toList())
-            currentAttempt.value = List(colorCount) { Color.Gray }
-            if (checkWinCondition(attempts.last(), secretCombo.value)) {
-                gameWon.value = true
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Display previous attempts
+                LazyColumn {
+                    items(attempts) { attempt ->
+                        GameRow(
+                            attemptColors = attempt,
+                            isClickable = false,
+                            onSelectColor = {},
+                        ) {}
+                    }
+                }
+
+                if (gameWon.value) {
+                    LaunchedEffect(gameWon.value) {
+                        navController.navigate("resultScreen/${attempts.size}/$colorCount")
+                    }
+                }
+
+                // Display the secret combo at the bottom of the screen
+                Row(modifier = Modifier.padding(top = 20.dp)) {
+                    Text("Secret Combo:", style = MaterialTheme.typography.titleMedium)
+                    secretCombo.value.forEach { color ->
+                        Box(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .padding(horizontal = 4.dp)
+                                .background(color)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
             }
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            // Add an empty spacer to push content to the top
+            Spacer(modifier = Modifier.weight(1f))
 
-        // Display previous attempts
-        LazyColumn {
-            items(attempts) { attempt ->
-                GameRow(
-                    attemptColors = attempt,
-                    isClickable = false,
-                    onSelectColor = {},
-                ) {}
-            }
-        }
-
-        if (gameWon.value) {
-            LaunchedEffect(gameWon.value) {
-                navController.navigate("resultScreen/${attempts.size}/$colorCount")
-            }
-        }
-
-        // Display the secret combo at the bottom of the screen
-        Row(modifier = Modifier.padding(top = 20.dp)) {
-            Text("Secret Combo:", style = MaterialTheme.typography.titleMedium)
-            secretCombo.value.forEach { color ->
-                Box(
+            // Column for the back button and color picker row at the bottom
+            Column {
+                Button(
+                    onClick = { navController.navigate("startScreen") },
                     modifier = Modifier
-                        .size(30.dp)
-                        .padding(horizontal = 4.dp)
-                        .background(color)
-                )
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text("Back to Home")
+                }
+
+                // Color Picker Row at the bottom of the screen
+                ColorPickerRow(baseColors) { color ->
+                    selectedColor.value = color
+                }
             }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Color Picker Row
-        ColorPickerRow(baseColors) { color ->
-            selectedColor.value = color
         }
     }
 }
