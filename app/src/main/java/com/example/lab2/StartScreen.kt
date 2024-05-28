@@ -3,6 +3,12 @@ package com.example.lab2
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +48,15 @@ fun StartScreen(navController: NavController) {
         }
     )
 
+    val scale = rememberInfiniteTransition().animateFloat(
+        initialValue = 1f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = ""
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -48,7 +64,11 @@ fun StartScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Welcome to MasterAnd", style = MaterialTheme.typography.titleLarge)
+        Text(
+            "Welcome to MasterAnd",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.scale(scale.value)
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -109,12 +129,22 @@ fun StartScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = {
-            colorCount.toIntOrNull()?.let {
-                if (it in 3..5) {
+            colorCount.toIntOrNull()?.let { count ->
+                if (count in 3..5 && name.isNotEmpty() && email.isNotEmpty()) {
                     coroutineScope.launch {
-                        val user = User(email, name, selectedImageUri?.toString())
-                        DatabaseInstance.database.userDao().insertUser(user)
-                        navController.navigate("gameScreen/$it?userEmail=$email")
+                        val existingUser = DatabaseInstance.database.userDao().getUserByEmail(email)
+                        if (existingUser != null) {
+                            if (existingUser.name != name) {
+                                DatabaseInstance.database.userDao().insertUser(
+                                    User(email = email, name = name, avatarUri = selectedImageUri?.toString())
+                                )
+                            }
+                        } else {
+                            DatabaseInstance.database.userDao().insertUser(
+                                User(email = email, name = name, avatarUri = selectedImageUri?.toString())
+                            )
+                        }
+                        navController.navigate("gameScreen/$count?userEmail=$email")
                     }
                 }
             }
@@ -126,7 +156,7 @@ fun StartScreen(navController: NavController) {
         Button(onClick = {
             navController.navigate("resultsScreen")
         }) {
-            Text("View Results")
+            Text("High Scores")
         }
     }
 }

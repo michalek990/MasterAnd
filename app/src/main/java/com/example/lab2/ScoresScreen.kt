@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 fun ScoresScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     var results by remember { mutableStateOf(emptyList<Result>()) }
-    var bestResult by remember { mutableStateOf<Result?>(null) }
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -38,11 +37,6 @@ fun ScoresScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        bestResult?.let {
-            Text("Best Result: ${it.score}", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
         LazyColumn {
             items(results) { result ->
                 Row(
@@ -51,9 +45,9 @@ fun ScoresScreen(navController: NavController) {
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    Text("Name: ${result.email}", style = MaterialTheme.typography.bodyLarge)
                     Text("Email: ${result.email}", style = MaterialTheme.typography.bodyLarge)
                     Text("Score: ${result.score}", style = MaterialTheme.typography.bodyLarge)
-                    Text("Colors: ${result.colorCount}", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }
@@ -69,7 +63,7 @@ fun ScoresScreen(navController: NavController) {
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Delete All Results")
+            Text("Clear All Results")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
