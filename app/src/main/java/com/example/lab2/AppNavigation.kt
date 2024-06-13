@@ -9,6 +9,7 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.lab2.Game.GameScreen
 import com.example.lab2.ui.theme.Lab2Theme
 
 @OptIn(ExperimentalAnimationApi::class)

@@ -1,4 +1,4 @@
-package com.example.lab2
+package com.example.lab2.Game
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

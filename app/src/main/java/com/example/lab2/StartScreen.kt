@@ -39,7 +39,6 @@ fun StartScreen(navController: NavController) {
     var colorCount by remember { mutableStateOf("") }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -72,7 +71,6 @@ fun StartScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Avatar selection
         Box(
             modifier = Modifier
                 .size(100.dp)
@@ -95,7 +93,6 @@ fun StartScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Name input
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
@@ -106,7 +103,6 @@ fun StartScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Email input
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -118,7 +114,6 @@ fun StartScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Color count input
         OutlinedTextField(
             value = colorCount,
             onValueChange = { colorCount = it },

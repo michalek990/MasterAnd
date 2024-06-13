@@ -1,4 +1,4 @@
-package com.example.lab2
+package com.example.lab2.Game
 
 import android.util.Log
 import androidx.compose.animation.*
@@ -6,15 +6,12 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -76,7 +73,6 @@ fun GameScreen(navController: NavController, colorCount: Int, userEmail: String)
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Display previous attempts with indicators
                 LazyColumn {
                     items(attempts.size) { index ->
                         AnimatedVisibility(
@@ -94,26 +90,23 @@ fun GameScreen(navController: NavController, colorCount: Int, userEmail: String)
                     }
                 }
 
-                // Display the secret combo at the bottom of the screen
-                Row(modifier = Modifier.padding(top = 20.dp)) {
-                    Text("Secret Combo:", style = MaterialTheme.typography.titleMedium)
-                    secretCombo.value.forEach { color ->
-                        Box(
-                            modifier = Modifier
-                                .size(30.dp)
-                                .padding(horizontal = 4.dp)
-                                .background(color)
-                        )
+                    Row(modifier = Modifier.padding(top = 20.dp)) {
+                        Text("Secret Combo:", style = MaterialTheme.typography.titleMedium)
+                        secretCombo.value.forEach { color ->
+                            Box(
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .padding(horizontal = 4.dp)
+                                    .background(color)
+                            )
+                        }
                     }
-                }
 
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Add an empty spacer to push content to the top
             Spacer(modifier = Modifier.weight(1f))
 
-            // Column for the back button and color picker row at the bottom
             Column {
                 val animatedButtonScale = animateFloatAsState(
                     targetValue = if (!gameWon.value) 1f else 0f,
@@ -130,7 +123,6 @@ fun GameScreen(navController: NavController, colorCount: Int, userEmail: String)
                     Text("Back to Home")
                 }
 
-                // Color Picker Row at the bottom of the screen
                 ColorPickerRow(baseColors) { color ->
                     selectedColor.value = color
                 }
