@@ -45,7 +45,6 @@ fun ScoresScreen(navController: NavController) {
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Name: ${result.email}", style = MaterialTheme.typography.bodyLarge)
                     Text("Email: ${result.email}", style = MaterialTheme.typography.bodyLarge)
                     Text("Score: ${result.score}", style = MaterialTheme.typography.bodyLarge)
                 }

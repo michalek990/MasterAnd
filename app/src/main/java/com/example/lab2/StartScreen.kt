@@ -39,6 +39,9 @@ fun StartScreen(navController: NavController) {
     var colorCount by remember { mutableStateOf("") }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     val coroutineScope = rememberCoroutineScope()
+    var isEmailValid by remember { mutableStateOf(true) }
+    var isNameValid by remember { mutableStateOf(true) }
+    var isColorCountValid by remember { mutableStateOf(true) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -98,8 +101,12 @@ fun StartScreen(navController: NavController) {
             onValueChange = { name = it },
             label = { Text("Name") },
             singleLine = true,
+            isError = !isNameValid,
             modifier = Modifier.fillMaxWidth()
         )
+        if (!isNameValid) {
+            Text("Name must be at least 4 characters", color = Color.Red)
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -109,38 +116,49 @@ fun StartScreen(navController: NavController) {
             label = { Text("Email") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            isError = !isEmailValid,
             modifier = Modifier.fillMaxWidth()
         )
+        if (!isEmailValid) {
+            Text("Invalid email address", color = Color.Red)
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = colorCount,
             onValueChange = { colorCount = it },
-            label = { Text("Enter number of colors") },
+            label = { Text("Enter number of colors (3-6)") },
             singleLine = true,
+            isError = !isColorCountValid,
             modifier = Modifier.fillMaxWidth()
         )
+        if (!isColorCountValid) {
+            Text("Number of colors must be between 3 and 6", color = Color.Red)
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = {
-            colorCount.toIntOrNull()?.let { count ->
-                if (count in 3..5 && name.isNotEmpty() && email.isNotEmpty()) {
-                    coroutineScope.launch {
-                        val existingUser = DatabaseInstance.database.userDao().getUserByEmail(email)
-                        if (existingUser != null) {
-                            if (existingUser.name != name) {
-                                DatabaseInstance.database.userDao().insertUser(
-                                    User(email = email, name = name, avatarUri = selectedImageUri?.toString())
-                                )
-                            }
-                        } else {
+            val count = colorCount.toIntOrNull()
+            isEmailValid = email.matches(Regex("^[A-Za-z0-9+_.-]+@(.+)$"))
+            isNameValid = name.length >= 4
+            isColorCountValid = count != null && count in 3..6
+
+            if (isEmailValid && isNameValid && isColorCountValid) {
+                coroutineScope.launch {
+                    val existingUser = DatabaseInstance.database.userDao().getUserByEmail(email)
+                    if (existingUser != null) {
+                        if (existingUser.name != name) {
                             DatabaseInstance.database.userDao().insertUser(
                                 User(email = email, name = name, avatarUri = selectedImageUri?.toString())
                             )
                         }
-                        navController.navigate("gameScreen/$count?userEmail=$email")
+                    } else {
+                        DatabaseInstance.database.userDao().insertUser(
+                            User(email = email, name = name, avatarUri = selectedImageUri?.toString())
+                        )
                     }
+                    navController.navigate("gameScreen/$count?userEmail=$email")
                 }
             }
         }) {
